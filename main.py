@@ -66,6 +66,7 @@ def calculate_easier_one_level_changes(row):
     if significance.pvalue < 0.01:
         change = change - 1 if positive else change + 1
         row["levelchange"] = change
+        row["next_p"] = round(significance.pvalue, 4)
         return row
 
     if positive:
@@ -76,6 +77,7 @@ def calculate_easier_one_level_changes(row):
     if significance.pvalue < 0.05:
         change = change - 1 if positive else change + 1
         row["levelchange"] = change
+        row["next_p"] = round(significance.pvalue, 4)
         return row
 
     return row
