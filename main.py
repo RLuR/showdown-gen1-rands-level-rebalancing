@@ -58,16 +58,6 @@ def calculate_easier_one_level_changes(row):
 
     positive = row["Win %"] > 0.5
     change = 0
-    if positive:
-        significance = binomtest(k=row["Raw wins"], n=row["Times generated"], p=0.51, alternative="greater")
-    else:
-        significance = binomtest(k=row["Raw wins"], n=row["Times generated"], p=0.49, alternative="less")
-
-    if significance.pvalue < 0.01:
-        change = change - 1 if positive else change + 1
-        row["levelchange"] = change
-        row["next_p"] = round(significance.pvalue, 4)
-        return row
 
     if positive:
         significance = binomtest(k=row["Raw wins"], n=row["Times generated"], p=0.515, alternative="greater")
@@ -77,8 +67,26 @@ def calculate_easier_one_level_changes(row):
     if significance.pvalue < 0.05:
         change = change - 1 if positive else change + 1
         row["levelchange"] = change
-        row["next_p"] = round(significance.pvalue, 4)
+        if change == -1:
+            row["next_p"] = round(binomtest(k=row["Raw wins"], n=row["Times generated"], p=0.53, alternative="greater").pvalue, 4)
+        else:
+            row["next_p"] = round(binomtest(k=row["Raw wins"], n=row["Times generated"], p=0.47, alternative="less").pvalue, 4)
         return row
+
+    if positive:
+        significance = binomtest(k=row["Raw wins"], n=row["Times generated"], p=0.51, alternative="greater")
+    else:
+        significance = binomtest(k=row["Raw wins"], n=row["Times generated"], p=0.49, alternative="less")
+
+    if significance.pvalue < 0.01:
+        change = change - 1 if positive else change + 1
+        row["levelchange"] = change
+        if change == -1:
+            row["next_p"] = round(binomtest(k=row["Raw wins"], n=row["Times generated"], p=0.53, alternative="greater").pvalue, 4)
+        else:
+            row["next_p"] = round(binomtest(k=row["Raw wins"], n=row["Times generated"], p=0.47, alternative="less").pvalue, 4)
+        return row
+
 
     return row
 
