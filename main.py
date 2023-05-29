@@ -2,7 +2,7 @@ import pandas as pd
 from scipy.stats import binomtest
 def main():
     data: pd.DataFrame = pd.read_csv("data.txt", sep="\t")
-    data['Win %'] = data['Win %'].str.rstrip('%').astype('float') / 100.0
+    data['Win %'] = round(data['Win %'].str.rstrip('%').astype('float') / 100.0, 4)
     data = data.apply(lambda row: calculate(row, three_max=False), axis=1)
 
     data = sort(data)
@@ -44,7 +44,7 @@ def calculate(row, three_max):
         else:
             break
     row["levelchange"] = change
-    row["next_p"] = significance.pvalue
+    row["next_p"] = round(significance.pvalue,4)
     return row
 
 if __name__ == "__main__":
