@@ -3,7 +3,7 @@ from scipy.stats import binomtest
 def main():
     data: pd.DataFrame = pd.read_csv("data.txt", sep="\t")
     data['Win %'] = data['Win %'].str.rstrip('%').astype('float') / 100.0
-    data = data.apply(lambda row: calculate(row), axis=1)
+    data = data.apply(lambda row: calculate(row, three_max=False), axis=1)
 
     data = sort(data)
     data.to_csv("result.csv", index=False)
@@ -18,8 +18,17 @@ def sort(df):
     return pd.concat([upper_half, lower_half], sort=False, ignore_index=True)
 
 
-def calculate(row):
-    cutoffs = [0.015, 0.03, 0.045]
+def calculate(row, three_max):
+    def cutoff_generator():
+        cutoff=0
+        while True:
+            cutoff = cutoff + 0.015
+            yield cutoff
+
+    if three_max:
+        cutoffs = [0.015, 0.03, 0.045]
+    else:
+        cutoffs = cutoff_generator()
     p = 0.05
     positive = row["Win %"] > 0.5
     change = 0
